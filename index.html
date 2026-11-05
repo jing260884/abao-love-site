@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>阿宝恋爱小站</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23ff7eb3' d='M12 21s-7-4.5-9.5-9A5 5 0 0 1 12 6a5 5 0 0 1 9.5 6C19 16.5 12 21 12 21z'/%3E%3C/svg%3E">
+<style>
+:root{
+  --pink:#ff7eb3; --pink-deep:#ff5c9d; --pink-bg:#fff0f5;
+  --purple:#a78bfa; --purple-deep:#8b5cf6;
+  --card:#ffffff; --ink:#4a3a4a; --ink-soft:#9a8a9a;
+  --line:#ffe3ee; --gold:#ffb347; --green:#34c98a; --red:#ff6b6b;
+  --r:20px; --shadow:0 6px 20px rgba(255,92,157,.10);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;background:var(--pink-bg);color:var(--ink);overflow:hidden}
+button{font-family:inherit;border:none;background:none;cursor:pointer;color:inherit}
+input,textarea{font-family:inherit;outline:none}
+img{display:block;max-width:100%}
+/* ===== 应用框架 ===== */
+.app{max-width:520px;margin:0 auto;height:100dvh;display:flex;flex-direction:column;background:#fff;position:relative;box-shadow:0 0 30px rgba(255,92,157,.12)}
+.topbar{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:linear-gradient(135deg,#ffd1e8,#ffe8f3);border-bottom:1px solid var(--line);position:relative;z-index:5}
+.topbar .logo{font-size:18px;font-weight:800;color:var(--pink-deep);letter-spacing:.5px}
+.topbar .logo small{font-weight:500;color:var(--ink-soft);font-size:12px}
+.topbar .actions{display:flex;gap:6px;align-items:center}
+.iconbtn{width:40px;height:40px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(255,92,157,.18);font-size:18px;position:relative}
+.iconbtn:active{transform:scale(.94)}
+.role-pill{display:flex;align-items:center;gap:6px;background:#fff;border-radius:20px;padding:3px 10px 3px 3px;box-shadow:0 2px 8px rgba(255,92,157,.16);font-size:12px;font-weight:700}
+.role-pill img{width:28px;height:28px;border-radius:50%;object-fit:cover}
+.main{flex:1 1 auto;overflow-y:auto;scroll-behavior:smooth}
+.page{display:none;padding:16px 16px 90px}
+.page.active{display:block}
+/* ===== 底部导航 ===== */
+.navbar{flex:0 0 auto;display:flex;background:#fff;border-top:1px solid var(--line);padding-bottom:max(8px,env(safe-area-inset-bottom))}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 0;font-size:11px;color:var(--ink-soft);transition:color .2s}
+.nav-item .ico{font-size:20px;line-height:1}
+.nav-item.active{color:var(--pink-deep);font-weight:700}
+/* ===== 通用组件 ===== */
+.card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:16px;margin-bottom:14px;border:1px solid var(--line)}
+.card-title{font-size:15px;font-weight:800;color:var(--ink);display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.section-label{font-size:13px;font-weight:700;color:var(--ink-soft);margin:16px 2px 8px;display:flex;align-items:center;gap:6px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:16px;padding:10px 16px;font-size:14px;font-weight:700;transition:transform .15s}
+.btn:active{transform:scale(.96)}
+.btn-primary{background:linear-gradient(135deg,var(--pink),var(--pink-deep));color:#fff;box-shadow:0 4px 14px rgba(255,92,157,.35)}
+.btn-soft{background:var(--pink-bg);color:var(--pink-deep)}
+.btn-purple{background:linear-gradient(135deg,var(--purple),var(--purple-deep));color:#fff;box-shadow:0 4px 14px rgba(139,92,246,.3)}
+.btn-ghost{background:#f5f0f5;color:var(--ink-soft)}
+.btn-block{width:100%}
+.btn-sm{padding:7px 12px;font-size:13px;border-radius:12px}
+.input{width:100%;background:#fbf5f9;border:1.5px solid var(--line);border-radius:14px;padding:11px 14px;font-size:16px;color:var(--ink);transition:border-color .2s}
+.input:focus{border-color:var(--pink)}
+textarea.input{resize:none;min-height:70px}
+/* ===== 首页 ===== */
+.hero{position:relative;border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);margin-bottom:14px;background:linear-gradient(135deg,#ffd1e8,#f9e0ff)}
+.hero img{width:100%;height:180px;object-fit:cover;object-position:center}
+.hero .overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,92,157,0) 40%,rgba(255,92,157,.75));display:flex;flex-direction:column;justify-content:flex-end;padding:16px;color:#fff}
+.hero .overlay .t1{font-size:22px;font-weight:900;letter-spacing:1px}
+.hero .overlay .t2{font-size:13px;opacity:.95;margin-top:4px}
+.stat-row{display:flex;gap:10px;margin-bottom:14px}
+.stat{flex:1;background:#fff;border:1px solid var(--line);border-radius:18px;padding:12px;box-shadow:var(--shadow);text-align:center}
+.stat .num{font-size:24px;font-weight:900;color:var(--pink-deep);line-height:1.2}
+.stat .num.gold{color:var(--gold)}
+.stat .lbl{font-size:11px;color:var(--ink-soft);margin-top:2px}
+.entry-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.entry{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:var(--shadow)}
+.entry:active{transform:scale(.97)}
+.entry .eico{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex:none}
+.entry .ename{font-size:14px;font-weight:800}
+.entry .edesc{font-size:11px;color:var(--ink-soft);margin-top:2px}
+.role-card{display:flex;align-items:center;gap:12px;padding:14px;border-radius:16px;background:#fff;border:1.5px solid var(--line);margin-bottom:10px}
+.role-card img{width:48px;height:48px;border-radius:14px;object-fit:cover;flex:none}
+.role-card .rname{font-weight:800;font-size:15px}
+.role-card .rtag{font-size:12px;color:var(--pink-deep);font-weight:600;margin-top:2px}
+.role-card.sel{border-color:var(--pink);box-shadow:0 4px 14px rgba(255,92,157,.2)}
+/* ===== 回忆墙 ===== */
+.memory-item{display:flex;gap:12px;padding:14px 0;border-bottom:1px solid var(--line);position:relative}
+.memory-item:last-child{border-bottom:none}
+.mem-avatar{width:40px;height:40px;border-radius:50%;object-fit:cover;flex:none}
+.mem-body{flex:1;min-width:0}
+.mem-head{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.mem-author{font-weight:800;font-size:14px}
+.mem-time{font-size:11px;color:var(--ink-soft)}
+.mem-text{font-size:14px;line-height:1.6;margin-top:6px;white-space:pre-wrap;word-break:break-word}
+.mem-img{border-radius:14px;margin-top:8px;max-height:220px;width:auto;object-fit:cover}
+.mem-actions{display:flex;gap:8px;margin-top:8px}
+/* ===== 小金库 ===== */
+.voucher{background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px;position:relative;overflow:hidden}
+.voucher .vhead{display:flex;align-items:center;gap:10px}
+.voucher .vico{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex:none}
+.voucher .vname{font-weight:800;font-size:15px}
+.voucher .vamount{font-size:13px;color:var(--ink-soft)}
+.voucher .vamount b{color:var(--pink-deep);font-size:15px}
+.progress{height:8px;background:#ffe9f1;border-radius:6px;overflow:hidden;margin:10px 0 6px}
+.progress > i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,var(--pink),var(--pink-deep));transition:width .4s}
+.vstats{display:flex;justify-content:space-between;font-size:11px;color:var(--ink-soft)}
+.vstats b{color:var(--ink)}
+.vbtns{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.order-item{display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.order-item:last-child{border-bottom:none}
+.order-item .oname{font-weight:700;font-size:14px}
+.order-item .oamount{font-weight:900;color:var(--pink-deep);font-size:16px}
+.order-item .ostatus{font-size:11px;padding:2px 8px;border-radius:10px}
+.ostatus.pending{background:#fff4e5;color:#d88a00}
+.ostatus.done{background:#e8faf1;color:var(--green)}
+.order-item .osub{font-size:11px;color:var(--ink-soft);margin-top:2px}
+.tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600}
+.tag.flower{background:#fff0f5;color:var(--pink-deep)}
+/* ===== 小红花 ===== */
+.flower-total{text-align:center;padding:20px;background:linear-gradient(135deg,#fff0f5,#ffe8f3);border-radius:20px;margin-bottom:14px;border:1px solid var(--line)}
+.flower-total .big{font-size:44px;font-weight:900;color:var(--pink-deep);line-height:1}
+.flower-total .cap{font-size:13px;color:var(--ink-soft);margin-top:8px}
+.habit{display:flex;align-items:center;gap:12px;background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:12px 14px;margin-bottom:10px}
+.habit .hico{width:40px;height:40px;border-radius:12px;background:var(--pink-bg);display:flex;align-items:center;justify-content:center;font-size:20px;flex:none}
+.habit .hinfo{flex:1;min-width:0}
+.habit .hname{font-weight:700;font-size:14px}
+.habit .hdesc{font-size:11px;color:var(--ink-soft);margin-top:2px}
+.habit .hreward{font-size:11px;color:var(--pink-deep);font-weight:700}
+.habit.done{border-color:var(--green);background:#f4fdf8}
+.habit.done .hname{color:var(--green)}
+.flow-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:13px}
+.flow-item:last-child{border-bottom:none}
+.flow-item .delta{font-weight:900;font-size:15px;white-space:nowrap}
+.flow-item .pos{color:var(--green)}
+.flow-item .neg{color:var(--red)}
+.flow-item .fdesc{flex:1;min-width:0;color:var(--ink);font-size:13px}
+.flow-item .ftime{font-size:11px;color:var(--ink-soft)}
+/* ===== 悄悄话 ===== */
+.whisper-list{display:flex;flex-direction:column;gap:12px}
+.whisper{display:flex;gap:8px;align-items:flex-start}
+.whisper.aj{flex-direction:row}
+.whisper.xmy{flex-direction:row-reverse}
+.whisper .wava{width:36px;height:36px;border-radius:50%;object-fit:cover;flex:none}
+.whisper .wbubble{max-width:70%;background:var(--pink-bg);border-radius:16px;border-top-left-radius:4px;padding:10px 13px;font-size:14px;line-height:1.6;position:relative}
+.whisper.xmy .wbubble{background:#f1eaff;border-radius:16px;border-top-right-radius:4px}
+.whisper .wmood{display:inline-block;margin-right:4px;font-size:15px}
+.whisper .wtime{font-size:10px;color:var(--ink-soft);margin-top:4px;text-align:right}
+.whisper-input{position:absolute;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:10px 16px;padding-bottom:max(10px,env(safe-area-inset-bottom));display:flex;gap:8px;align-items:flex-end}
+.whisper-input .wi{flex:1}
+.mood-pick{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.mood{font-size:22px;padding:6px 8px;border-radius:12px;background:#fff;border:1.5px solid var(--line)}
+.mood.sel{background:var(--pink-bg);border-color:var(--pink);transform:scale(1.05)}
+/* ===== 心愿 ===== */
+.wish{background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:14px;margin-bottom:10px;position:relative}
+.wish.done{border-color:var(--green);background:#f4fdf8}
+.wish .whead{display:flex;align-items:center;gap:10px}
+.wish .wtitle{font-weight:800;font-size:15px;flex:1}
+.wish.done .wtitle{color:var(--green);text-decoration:line-through}
+.wish .wdesc{font-size:13px;color:var(--ink-soft);margin-top:6px;white-space:pre-wrap}
+.wish .wimg{border-radius:12px;margin-top:8px;max-height:160px}
+.wish .wnote{font-size:13px;background:#fff7fa;border-radius:10px;padding:8px;margin-top:8px;white-space:pre-wrap}
+.check-circle{width:30px;height:30px;border-radius:50%;border:2px solid var(--pink);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--pink);flex:none}
+.wish.done .check-circle{background:var(--green);border-color:var(--green);color:#fff}
+.wish-progress{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.wish-progress .ptext{font-size:13px;color:var(--ink-soft);white-space:nowrap}
+/* ===== 我的 ===== */
+.backbtn{display:inline-flex;align-items:center;gap:4px;font-size:13px;color:var(--ink-soft);margin-bottom:10px}
+.backbtn b{color:var(--ink)}
+/* ===== 弹窗 ===== */
+.overlay{position:absolute;inset:0;background:rgba(74,58,74,.45);display:none;align-items:flex-end;justify-content:center;z-index:40}
+.overlay.show{display:flex}
+.modal{background:#fff;width:100%;max-width:520px;border-radius:24px 24px 0 0;padding:20px;padding-bottom:max(20px,env(safe-area-inset-bottom));max-height:82%;overflow-y:auto;animation:slideup .3s ease}
+@keyframes slideup{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+.modal-title{font-size:17px;font-weight:800;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+.modal-title .x{width:32px;height:32px;border-radius:50%;background:#f5f0f5;display:flex;align-items:center;justify-content:center;font-size:16px}
+.field{margin-bottom:12px}
+.field label{font-size:13px;font-weight:700;color:var(--ink);display:block;margin-bottom:6px}
+/* ===== Toast & 撤销 ===== */
+.toast-wrap{position:absolute;left:0;right:0;bottom:84px;display:flex;flex-direction:column;align-items:center;gap:8px;z-index:50;pointer-events:none}
+.toast{background:var(--ink);color:#fff;border-radius:14px;padding:10px 14px;font-size:13px;display:flex;align-items:center;gap:10px;box-shadow:0 6px 20px rgba(0,0,0,.2);pointer-events:auto;animation:pop .3s ease}
+@keyframes pop{from{transform:translateY(10px);opacity:0}to{transform:none;opacity:1}}
+.toast .undo{background:#fff;color:var(--ink);border-radius:10px;padding:5px 10px;font-size:12px;font-weight:700;white-space:nowrap}
+.toast .undo:active{background:#ffe3ee}
+/* ===== 庆祝动画 ===== */
+.celebration{position:absolute;inset:0;display:none;align-items:center;justify-content:center;z-index:60;pointer-events:none;background:rgba(255,255,255,.15)}
+.celebration.show{display:flex}
+.cele-inner{text-align:center}
+.cele-duo{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:6px}
+.cele-duo img{width:88px;height:88px;border-radius:24px;object-fit:cover;animation:bob 1s ease-in-out infinite}
+.cele-duo .heart{font-size:34px;color:var(--pink-deep);animation:pulse 0.8s ease-in-out infinite}
+.cele-text{font-size:15px;font-weight:800;color:var(--ink);background:#fff;display:inline-block;padding:8px 16px;border-radius:16px;box-shadow:var(--shadow)}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+.confetti{position:absolute;width:10px;height:10px;border-radius:2px;opacity:0;animation:fall 2s linear forwards}
+@keyframes fall{0%{opacity:1;transform:translateY(-10px) rotate(0)}100%{opacity:0;transform:translateY(70vh) rotate(720deg)}}
+.empty{text-align:center;padding:30px 10px;color:var(--ink-soft);font-size:13px;line-height:1.7}
+.empty .eemoji{font-size:34px;margin-bottom:8px}
+/* ===== 响应式 ===== */
+@media (min-width:768px){
+  .app{height:100vh}
+  .cele-duo img{width:110px;height:110px}
+}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <!-- 顶栏 -->
+  <header class="topbar">
+    <div class="logo">阿宝恋爱小站<small> 小绵羊 &amp; 阿瑾</small></div>
+    <div class="actions">
+      <button class="role-pill" id="rolePillBtn"><img id="rolePillImg" alt=""><span id="rolePillName">小绵羊</span></button>
+      <button class="iconbtn" id="myBtn">⚙️</button>
+    </div>
+  </header>
+
+  <!-- 内容区 -->
+  <main class="main" id="main">
+    <!-- 首页 -->
+    <section class="page active" id="page-home">
+      <div class="hero">
+        <img src="couple.jpg" alt="小绵羊和阿瑾">
+        <div class="overlay"><div class="t1">小绵羊 &amp; 阿瑾</div><div class="t2">只属于我们的小天地</div></div>
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="num" id="homeFlower">0</div><div class="lbl">🌸 小红花</div></div>
+        <div class="stat"><div class="num gold" id="homePiggy">¥0</div><div class="lbl">🐷 小荷包</div></div>
+      </div>
+      <div class="section-label">去逛逛</div>
+      <div class="entry-grid">
+        <button class="entry" data-go="memory"><span class="eico" style="background:#ffe3ee">💌</span><div><div class="ename">回忆墙</div><div class="edesc">记录我们的点滴</div></div></button>
+        <button class="entry" data-go="vault"><span class="eico" style="background:#fff1e0">💰</span><div><div class="ename">小金库</div><div class="edesc">给阿瑾的零花钱</div></div></button>
+        <button class="entry" data-go="whisper"><span class="eico" style="background:#ece8ff">💬</span><div><div class="ename">悄悄话</div><div class="edesc">只说给你听</div></div></button>
+        <button class="entry" data-go="wish"><span class="eico" style="background:#e7f7f0">🌟</span><div><div class="ename">心愿清单</div><div class="edesc">想一起做的事</div></div></button>
+        <button class="entry" data-go="flower"><span class="eico" style="background:#fff0f5">🌷</span><div><div class="ename">小红花</div><div class="edesc">打卡攒花花</div></div></button>
+        <button class="entry" data-go="piggy"><span class="eico" style="background:#fffbe6">🐷</span><div><div class="ename">小荷包</div><div class="edesc">存起小零钱</div></div></button>
+      </div>
+      <div class="section-label">角色身份</div>
+      <div class="role-card" id="roleCardXmy"><img src="xmy.jpg" alt="小绵羊"><div style="flex:1"><div class="rname">小绵羊</div><div class="rtag">管账小能手 · 确认转账 · 管理额度</div></div></div>
+      <div class="role-card" id="roleCardAj"><img src="aj.jpg" alt="阿瑾"><div style="flex:1"><div class="rname">阿瑾</div><div class="rtag">负责下单 · 上传回忆</div></div></div>
+    </section>
+
+    <!-- 回忆墙 -->
+    <section class="page" id="page-memory">
+      <div class="section-label">回忆墙 · 我们的点滴</div>
+      <button class="btn btn-primary btn-block" id="addMemoryBtn">💌 发布一条回忆</button>
+      <div id="memoryList" style="margin-top:14px"></div>
+    </section>
+
+    <!-- 小金库 -->
+    <section class="page" id="page-vault">
+      <div class="section-label">小金库 · 给阿瑾的零花钱</div>
+      <div id="voucherList"></div>
+      <div class="section-label">下单记录</div>
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <button class="btn btn-sm btn-soft" id="tabOrdersPending">待转账</button>
+        <button class="btn btn-sm btn-ghost" id="tabOrdersDone">已到账</button>
+      </div>
+      <div id="orderList"></div>
+    </section>
+
+    <!-- 悄悄话 -->
+    <section class="page" id="page-whisper">
+      <div class="section-label">悄悄话 · 只说给你听</div>
+      <div class="whisper-list" id="whisperList"></div>
+      <div style="height:70px"></div>
+    </section>
+
+    <!-- 心愿 -->
+    <section class="page" id="page-wish">
+      <div class="section-label">心愿清单 · 想一起做的事</div>
+      <div class="wish-progress">
+        <div class="progress" style="flex:1;margin:0"><i id="wishBar"></i></div>
+        <div class="ptext" id="wishText">0 / 0</div>
+      </div>
+      <button class="btn btn-primary btn-block" id="addWishBtn">🌟 许一个新心愿</button>
+      <div id="wishList" style="margin-top:14px"></div>
+    </section>
+
+    <!-- 小红花 -->
+    <section class="page" id="page-flower">
+      <button class="backbtn">‹ <b>返回</b></button>
+      <div class="flower-total"><div class="big" id="flowerTotal">0</div><div class="cap">🌸 已攒小红花（1朵 = 1元，可在小金库抵扣）</div></div>
+      <div class="section-label">打卡攒花</div>
+      <div id="habitList"></div>
+      <div class="section-label">花花流水</div>
+      <div id="flowerFlow" style="background:#fff;border:1px solid var(--line);border-radius:16px;padding:4px 14px"></div>
+    </section>
+
+    <!-- 小荷包 -->
+    <section class="page" id="page-piggy">
+      <button class="backbtn">‹ <b>返回</b></button>
+      <div class="flower-total"><div class="big" style="color:var(--gold)" id="piggyTotal">¥0</div><div class="cap">🐷 专属小荷包 · 存起来的零钱</div></div>
+      <div class="section-label">存进荷包（当月没用完的券）</div>
+      <div id="piggyList"></div>
+      <div class="section-label">荷包流水</div>
+      <div id="piggyFlow" style="background:#fff;border:1px solid var(--line);border-radius:16px;padding:4px 14px"></div>
+    </section>
+
+    <!-- 我的 -->
+    <section class="page" id="page-me">
+      <button class="backbtn">‹ <b>返回</b></button>
+      <div class="section-label">当前角色</div>
+      <div id="meRole"></div>
+      <div class="section-label">数据备份（两台手机同步用）</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-sm btn-soft" id="exportBtn">📤 导出备份</button>
+        <button class="btn btn-sm btn-ghost" id="importBtn">📥 导入备份</button>
+      </div>
+      <p style="font-size:12px;color:var(--ink-soft);margin-top:8px;line-height:1.6">数据存在手机本地。导出生成一串备份文本，复制发给对方，对方导入即可同步，两边经常同步一次就好。</p>
+      <div class="section-label">说明</div>
+      <div class="card" style="box-shadow:none"><div style="font-size:13px;line-height:1.8;color:var(--ink-soft)">这是纯前端版恋爱小站，无需服务器。阿瑾下单 → 小绵羊确认转账；所有支出有记录；误操作可在几秒内撤销。数据只存当前设备，请定期互相备份。</div></div>
+    </section>
+  </main>
+
+  <!-- 悄悄话输入条（固定在底部导航上方） -->
+  <div class="whisper-input" id="whisperInput" style="display:none">
+    <div style="flex:1;min-width:0">
+      <div class="mood-pick" id="moodPick"></div>
+      <textarea class="input" id="whisperText" placeholder="写点心里话…" style="min-height:40px;font-size:16px"></textarea>
+    </div>
+    <button class="btn btn-primary btn-sm" id="sendWhisperBtn">发送</button>
+  </div>
+
+  <!-- 底部导航 -->
+  <nav class="navbar">
+    <button class="nav-item active" data-nav="home"><span class="ico">🏠</span><span>首页</span></button>
+    <button class="nav-item" data-nav="memory"><span class="ico">💌</span><span>回忆</span></button>
+    <button class="nav-item" data-nav="vault"><span class="ico">💰</span><span>小金库</span></button>
+    <button class="nav-item" data-nav="whisper"><span class="ico">💬</span><span>悄悄话</span></button>
+    <button class="nav-item" data-nav="wish"><span class="ico">🌟</span><span>心愿</span></button>
+  </nav>
+
+  <!-- Toast & 撤销 -->
+  <div class="toast-wrap" id="toastWrap"></div>
+
+  <!-- 庆祝动画 -->
+  <div class="celebration" id="celebration"><div class="cele-inner"><div class="cele-duo"><img src="xmy.jpg" id="celeImg1" alt=""><span class="heart" id="celeHeart">💗</span><img src="aj.jpg" id="celeImg2" alt=""></div><div class="cele-text" id="celeText">下单成功！</div></div></div>
+</div>
+
+<!-- 通用弹窗容器 -->
+<div class="overlay" id="overlay"><div class="modal" id="modalBox"></div></div>
+
+<script>
+/* ============ 数据层 ============ */
+var STORE_KEY = 'ab_lovestation_v1';
+var CURRENT_MONTH = (function(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');})();
+
+/* 券配置：名字、每月金额、图标、配色 */
+var VOUCHERS = [
+  {id:'clothes', name:'衣服购物券', amount:150, icon:'👕', color:'#ffe3ee'},
+  {id:'milktea', name:'奶茶小金券', amount:18,  icon:'🧋', color:'#f9e0ff'},
+  {id:'food',    name:'美食小金券', amount:30,  icon:'🍜', color:'#fff1e0'},
+  {id:'snack',   name:'小零食小金券', amount:10, icon:'🍬', color:'#e7f7f0'},
+  {id:'beauty',  name:'美妆护肤小金券', amount:30, icon:'💄', color:'#ece8ff'}
+];
+
+/* 小红花打卡规则 */
+var HABITS = [
+  {id:'sleep', name:'早睡打卡', desc:'23点之前睡觉', reward:1, icon:'🌙'},
+  {id:'drink', name:'两周不喝饮料', desc:'连续14天没喝饮料', reward:2, icon:'🥤'},
+  {id:'study', name:'周末学习', desc:'放下手机学习1.5小时', reward:2, icon:'📚'}
+];
+
+var MOODS = [
+  {id:'happy', ico:'😊', name:'开心'},
+  {id:'moved', ico:'🥹', name:'感动'},
+  {id:'miss', ico:'💭', name:'想你'},
+  {id:'sad', ico:'😢', name:'委屈'},
+  {id:'angry', ico:'😤', name:'生气'},
+  {id:'sweet', ico:'💖', name:'甜甜的'}
+];
+
+/* 默认状态：全部清零 */
+function defaultState(){
+  return {
+    role:'xmy',                /* xmy=小绵羊, aj=阿瑾 */
+    memories:[],               /* {id,role,text,img,time} */
+    usage:{},                  /* {'clothes-2026-11': used} 各券当月已用 */
+    orders:[],                 /* {id,voucherId,amount,note,flower,status,time,month} */
+    flowers:0,                 /* 小红花总数 */
+    flowerLogs:[],             /* {id,delta,reason,time} */
+    habitLogs:[],              /* {id,habitId,time} 打卡记录 */
+    piggy:0,                   /* 荷包总额 */
+    piggyLogs:[],              /* {id,delta,reason,time} */
+    piggyDeposited:{},         /* {'clothes-2026-11':true} 当月某券是否已存入 */
+    wishes:[],                 /* {id,title,desc,done,img,note,doneTime,time} */
+    whispers:[]                /* {id,role,mood,text,time} */
+  };
+}
+function loadState(){
+  try{ var s=JSON.parse(localStorage.getItem(STORE_KEY)); if(s && s.role) return s; }catch(e){}
+  return defaultState();
+}
+var state = loadState();
+function save(){ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
+
+/* 撤销机制 */
+var undoQueue = {}; /* id -> {type,data,fn} */
+function toast(msg, undoFn){
+  var w=document.getElementById('toastWrap');
+  var t=document.createElement('div');
+  t.className='toast';
+  t.innerHTML='<span>'+msg+'</span>';
+  if(undoFn){
+    var b=document.createElement('button');
+    b.className='undo'; b.textContent='撤销';
+    b.onclick=function(){ undoFn(); w.removeChild(t); save(); rerender(); };
+    t.appendChild(b);
+  }
+  w.appendChild(t);
+  setTimeout(function(){ if(t.parentNode) t.parentNode.removeChild(t); }, 6000);
+}
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+function fmtTime(t){
+  var d=new Date(t); var p=function(n){return String(n).padStart(2,'0');};
+  return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes());
+}
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+function roleInfo(r){ return r==='aj' ? {name:'阿瑾', img:'aj.jpg'} : {name:'小绵羊', img:'xmy.jpg'}; }
+function usageKey(vid){ return vid+'-'+CURRENT_MONTH; }
+function getUsed(vid){ return state.usage[usageKey(vid)]||0; }
+function setUsed(vid,val){ state.usage[usageKey(vid)]=val; }
+
+/* ============ 导航 ============ */
+var navs = ['home','memory','vault','whisper','wish','flower','piggy','me'];
+function showPage(id){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  var el=document.getElementById('page-'+id);
+  if(el) el.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(function(n){
+    n.classList.toggle('active', n.getAttribute('data-nav')===id);
+  });
+  /* 悄悄话输入条只在悄悄话页显示 */
+  var wi=document.getElementById('whisperInput');
+  wi.style.display = (id==='whisper') ? 'flex' : 'none';
+  if(id==='home') refreshHome();
+  if(id==='memory') refreshMemory();
+  if(id==='vault') refreshVault();
+  if(id==='wish') refreshWish();
+  if(id==='flower') refreshFlower();
+  if(id==='piggy') refreshPiggy();
+  if(id==='me') refreshMe();
+  document.getElementById('main').scrollTop=0;
+  updateRolePill();
+}
+document.querySelectorAll('.nav-item').forEach(function(n){
+  n.addEventListener('click',function(){ showPage(n.getAttribute('data-nav')); });
+});
+document.querySelectorAll('.entry[data-go]').forEach(function(e){
+  e.addEventListener('click',function(){ showPage(e.getAttribute('data-go')); });
+});
+document.querySelectorAll('.backbtn').forEach(function(b){
+  b.addEventListener('click',function(){ showPage('home'); });
+});
+
+/* 顶栏角色按钮：点击切换弹窗 */
+document.getElementById('rolePillBtn').addEventListener('click', openRoleModal);
+document.getElementById('myBtn').addEventListener('click', function(){ showPage('me'); });
+
+/* ============ 角色 ============ */
+function updateRolePill(){
+  var r=roleInfo(state.role);
+  document.getElementById('rolePillImg').src=r.img;
+  document.getElementById('rolePillName').textContent=r.name;
+}
+function setRole(r){
+  state.role=r; save(); updateRolePill();
+  /* 首页角色卡片高亮 */
+  document.getElementById('roleCardXmy').classList.toggle('sel', r==='xmy');
+  document.getElementById('roleCardAj').classList.toggle('sel', r==='aj');
+}
+document.getElementById('roleCardXmy').addEventListener('click', function(){ setRole('xmy'); toast('现在是：小绵羊（管账）'); refreshHome(); });
+document.getElementById('roleCardAj').addEventListener('click', function(){ setRole('aj'); toast('现在是：阿瑾（下单）'); refreshHome(); });
+
+function openRoleModal(){
+  var box=document.getElementById('modalBox');
+  box.innerHTML='<div class="modal-title">选择当前角色<span class="x" data-close>✕</span></div>'+
+    '<div style="display:flex;gap:10px">'+
+    '<button class="btn btn-soft btn-block" id="mRoleXmy" style="flex-direction:column;padding:16px"><img src="xmy.jpg" style="width:64px;height:64px;border-radius:16px;object-fit:cover;margin-bottom:6px">小绵羊<br><span style="font-weight:400;font-size:11px">管账·确认转账</span></button>'+
+    '<button class="btn btn-purple btn-block" id="mRoleAj" style="flex-direction:column;padding:16px"><img src="aj.jpg" style="width:64px;height:64px;border-radius:16px;object-fit:cover;margin-bottom:6px">阿瑾<br><span style="font-weight:400;font-size:11px">下单</span></button>'+
+    '</div>';
+  showOverlay();
+  bindClose(box);
+  document.getElementById('mRoleXmy').onclick=function(){ setRole('xmy'); hideOverlay(); toast('现在是：小绵羊'); };
+  document.getElementById('mRoleAj').onclick=function(){ setRole('aj'); hideOverlay(); toast('现在是：阿瑾'); };
+}
+
+/* ============ 弹窗 ============ */
+function showOverlay(){ document.getElementById('overlay').classList.add('show'); }
+function hideOverlay(){ document.getElementById('overlay').classList.remove('show'); }
+function bindClose(box){
+  var x=box.querySelector('[data-close]');
+  if(x) x.onclick=hideOverlay;
+}
+document.getElementById('overlay').addEventListener('click',function(e){
+  if(e.target===this) hideOverlay();
+});
+
+/* ============ 庆祝动画 ============ */
+function celebrate(text, type){
+  var c=document.getElementById('celebration');
+  var heart=document.getElementById('celeHeart');
+  var t=document.getElementById('celeText');
+  heart.textContent = type==='hug' ? '🤗' : type==='kiss' ? '💋' : '💗';
+  t.textContent = text;
+  c.classList.add('show');
+  /* 撒花 */
+  var colors=['#ff7eb3','#a78bfa','#ffb347','#34c98a','#ff6b6b'];
+  var frag=document.createDocumentFragment();
+  for(var i=0;i<22;i++){
+    var s=document.createElement('span');
+    s.className='confetti';
+    s.style.left=Math.random()*100+'%';
+    s.style.background=colors[i%colors.length];
+    s.style.animationDelay=(Math.random()*0.8)+'s';
+    frag.appendChild(s);
+  }
+  c.appendChild(frag);
+  setTimeout(function(){
+    c.classList.remove('show');
+    var cf=c.querySelectorAll('.confetti');
+    cf.forEach(function(x){x.remove();});
+  }, 1800);
+}
+
+/* ============ 首页 ============ */
+function refreshHome(){
+  document.getElementById('homeFlower').textContent = state.flowers;
+  document.getElementById('homePiggy').textContent = '¥'+state.piggy;
+  setRole(state.role);
+}
+
+/* ============ 回忆墙 ============ */
+function refreshMemory(){
+  var box=document.getElementById('memoryList');
+  if(state.memories.length===0){
+    box.innerHTML='<div class="empty"><div class="eemoji">💌</div>还没有回忆<br>发第一条吧～</div>';
+    return;
+  }
+  var html='';
+  var arr=state.memories.slice().reverse();
+  arr.forEach(function(m){
+    var r=roleInfo(m.role);
+    html+='<div class="card" style="box-shadow:none;border:1px solid var(--line);margin-bottom:12px">'+
+      '<div class="memory-item" style="border:none;padding:0">'+
+      '<img class="mem-avatar" src="'+r.img+'">'+
+      '<div class="mem-body">'+
+        '<div class="mem-head"><span class="mem-author" style="color:'+(m.role==='aj'?'var(--pink-deep)':'var(--purple-deep)')+'">'+r.name+'</span><span class="mem-time">'+fmtTime(m.time)+'</span></div>'+
+        '<div class="mem-text">'+esc(m.text)+'</div>'+
+        (m.img?'<img class="mem-img" src="'+esc(m.img)+'" onerror="this.style.display=\'none\'">':'')+
+        '<div class="mem-actions"><button class="btn btn-sm btn-ghost" data-delmem="'+m.id+'">删除</button></div>'+
+      '</div></div></div>';
+  });
+  box.innerHTML=html;
+  box.querySelectorAll('[data-delmem]').forEach(function(b){
+    b.onclick=function(){
+      var id=b.getAttribute('data-delmem');
+      var mem=state.memories.find(function(x){return x.id===id;});
+      var idx=state.memories.findIndex(function(x){return x.id===id;});
+      state.memories.splice(idx,1); save();
+      toast('已删除回忆', function(){ state.memories.splice(idx,0,mem); save(); rerender(); });
+      refreshMemory();
+    };
+  });
+}
+document.getElementById('addMemoryBtn').addEventListener('click', function(){
+  var box=document.getElementById('modalBox');
+  box.innerHTML='<div class="modal-title">发布一条回忆<span class="x" data-close>✕</span></div>'+
+    '<div class="field"><label>谁发的</label><div style="display:flex;gap:8px">'+
+      '<button class="btn btn-soft btn-sm" id="mMemXmy">小绵羊</button>'+
+      '<button class="btn btn-purple btn-sm" id="mMemAj">阿瑾</button>'+
+    '</div></div>'+
+    '<div class="field"><label>约会感受</label><textarea class="input" id="mMemText" placeholder="写下这一刻的心情…"></textarea></div>'+
+    '<div class="field"><label>照片链接（可选）</label><input class="input" id="mMemImg" placeholder="粘贴图片网址，可留空"></div>'+
+    '<button class="btn btn-primary btn-block" id="mMemSave">发布</button>';
+  showOverlay(); bindClose(box);
+  var role='xmy';
+  document.getElementById('mMemXmy').onclick=function(){role='xmy';document.getElementById('mMemXmy').style.background='var(--pink-deep)';document.getElementById('mMemXmy').style.color='#fff';document.getElementById('mMemAj').style.background='';document.getElementById('mMemAj').style.color='';};
+  document.getElementById('mMemAj').onclick=function(){role='aj';document.getElementById('mMemAj').style.background='var(--purple-deep)';document.getElementById('mMemAj').style.color='#fff';document.getElementById('mMemXmy').style.background='';document.getElementById('mMemXmy').style.color='';};
+  document.getElementById('mMemSave').onclick=function(){
+    var text=document.getElementById('mMemText').value.trim();
+    var img=document.getElementById('mMemImg').value.trim();
+    if(!text && !img){ toast('写点感受或加张照片吧'); return; }
+    state.memories.push({id:uid(), role:role, text:text, img:img, time:Date.now()});
+    save(); hideOverlay(); toast('回忆已发布'); refreshMemory();
+  };
+});
+
+/* ============ 小金库 ============ */
+function refreshVault(){
+  var vlist=document.getElementById('voucherList');
+  var html='';
+  VOUCHERS.forEach(function(v){
+    var used=getUsed(v.id);
+    var remain=Math.max(0, v.amount-used);
+    var pct=Math.min(100, Math.round(used/v.amount*100));
+    var deposited = state.piggyDeposited[usageKey(v.id)];
+    html+='<div class="voucher">'+
+      '<div class="vhead"><span class="vico" style="background:'+v.color+'">'+v.icon+'</span>'+
+        '<div style="flex:1"><div class="vname">'+v.name+'</div><div class="vamount">本月 <b>¥'+v.amount+'</b> · 已用 ¥'+used+'</div></div>'+
+        (deposited?'<span class="tag" style="background:#fffbe6;color:var(--gold)">已存入荷包</span>':'')+
+      '</div>'+
+      '<div class="progress"><i style="width:'+pct+'%"></i></div>'+
+      '<div class="vstats"><span>已用 <b>¥'+used+'</b></span><span>剩余 <b style="color:var(--pink-deep)">¥'+remain+'</b></span></div>'+
+      '<div class="vbtns">'+
+        '<button class="btn btn-sm btn-primary" data-order="'+v.id+'" '+(state.role!=='aj'?'style="opacity:.45"':'')+'>下单</button>'+
+        '<button class="btn btn-sm btn-soft" data-piggy="'+v.id+'" '+(used<=0||deposited?'style="opacity:.45"':'')+'>存进荷包</button>'+
+      '</div></div>';
+  });
+  vlist.innerHTML=html;
+  vlist.querySelectorAll('[data-order]').forEach(function(b){
+    b.onclick=function(){
+      if(state.role!=='aj'){ toast('现在是「小绵羊」视角，请切换到阿瑾才能下单'); return; }
+      openOrderModal(b.getAttribute('data-order'));
+    };
+  });
+  vlist.querySelectorAll('[data-piggy]').forEach(function(b){
+    b.onclick=function(){ depositPiggy(b.getAttribute('data-piggy')); };
+  });
+  /* 订单 */
+  var pending = state.orders.filter(function(o){return o.status==='pending';});
+  var done = state.orders.filter(function(o){return o.status==='done';});
+  var showDone = document.getElementById('tabOrdersDone').style.background==='var(--pink-bg)' || false;
+  var cur = showDone ? done : pending;
+  var olist=document.getElementById('orderList');
+  if(cur.length===0){
+    olist.innerHTML='<div class="empty"><div class="eemoji">🛒</div>'+(showDone?'还没有已到账的订单':'还没有待转账的订单')+'</div>';
+    return;
+  }
+  var ohtml='';
+  cur.slice().reverse().forEach(function(o){
+    var v=VOUCHERS.find(function(x){return x.id===o.voucherId;});
+    var r=roleInfo('aj');
+    ohtml+='<div class="order-item">'+
+      '<img src="aj.jpg" style="width:38px;height:38px;border-radius:12px;object-fit:cover;flex:none">'+
+      '<div style="flex:1;min-width:0"><div class="oname">'+(v?v.name:'')+' <span class="oamount">¥'+o.amount+'</span></div>'+
+      '<div class="osub">'+(o.note?esc(o.note):'')+'</div>'+
+      (o.flower?'<div class="osub"><span class="tag flower">🌸 用 '+o.flower+' 朵抵扣 ¥'+o.flower+'</span></div>':'')+
+      '<div class="osub">'+fmtTime(o.time)+'</div></div>'+
+      (o.status==='pending'
+        ? (state.role==='xmy'
+            ? '<button class="btn btn-sm btn-primary" data-confirm="'+o.id+'">确认转账</button>'
+            : '<span class="ostatus pending">待转账</span>')
+        : '<span class="ostatus done">已到账</span>')+
+    '</div>';
+  });
+  olist.innerHTML=ohtml;
+  olist.querySelectorAll('[data-confirm]').forEach(function(b){
+    b.onclick=function(){
+      var id=b.getAttribute('data-confirm');
+      var o=state.orders.find(function(x){return x.id===id;});
+      if(state.role!=='xmy'){ toast('请切换到「小绵羊」才能确认转账'); return; }
+      o.status='done'; save();
+      toast('已转账 ¥'+o.amount, function(){ o.status='pending'; save(); rerender(); });
+      refreshVault(); celebrate('转账成功！','kiss');
+    };
+  });
+}
+document.getElementById('tabOrdersPending').onclick=function(){
+  this.style.background='var(--pink-bg)';this.style.color='var(--pink-deep)';
+  document.getElementById('tabOrdersDone').style.background='';document.getElementById('tabOrdersDone').style.color='';
+  refreshVault();
+};
+document.getElementById('tabOrdersDone').onclick=function(){
+  this.style.background='var(--pink-bg)';this.style.color='var(--pink-deep)';
+  document.getElementById('tabOrdersPending').style.background='';document.getElementById('tabOrdersPending').style.color='';
+  refreshVault();
+};
+
+/* 下单弹窗 */
+function openOrderModal(vid){
+  var v=VOUCHERS.find(function(x){return x.id===vid;});
+  var used=getUsed(vid); var remain=Math.max(0,v.amount-used);
+  var maxFlower=Math.min(state.flowers, remain);
+  var box=document.getElementById('modalBox');
+  box.innerHTML='<div class="modal-title">下单 · '+v.name+'<span class="x" data-close>✕</span></div>'+
+    '<div style="font-size:13px;color:var(--ink-soft);margin-bottom:12px">本月剩余 <b style="color:var(--pink-deep)">¥'+remain+'</b> · 可用小红花 <b style="color:var(--pink-deep)">'+state.flowers+'</b> 朵（1朵=1元）</div>'+
+    '<div class="field"><label>金额（元）</label><input class="input" type="number" id="mOrderAmt" min="0" max="'+remain+'" placeholder="最多 ¥'+remain+'"></div>'+
+    '<div class="field"><label>小红花抵扣（可选）</label><input class="input" type="number" id="mOrderFlower" min="0" max="'+maxFlower+'" placeholder="用 X 朵抵扣，最多 '+maxFlower+' 朵"></div>'+
+    '<div class="field"><label>备注（给小绵羊的话）</label><input class="input" id="mOrderNote" placeholder="给小绵羊的下单小备注～"></div>'+
+    '<button class="btn btn-primary btn-block" id="mOrderSave">下单</button>';
+  showOverlay(); bindClose(box);
+  document.getElementById('mOrderSave').onclick=function(){
+    var amt=parseFloat(document.getElementById('mOrderAmt').value);
+    var flower=parseInt(document.getElementById('mOrderFlower').value)||0;
+    var note=document.getElementById('mOrderNote').value.trim();
+    if(!amt || amt<=0 || amt>remain){ toast('金额要在 ¥0 ~ ¥'+remain+' 之间'); return; }
+    if(flower<0 || flower>maxFlower){ toast('小红花数量不对'); return; }
+    /* 实际支付 = 金额 - 抵扣 */
+    state.orders.push({id:uid(), voucherId:vid, amount:amt, note:note, flower:flower, status:'pending', time:Date.now(), month:CURRENT_MONTH});
+    setUsed(vid, getUsed(vid)+amt);
+    state.flowers -= flower;
+    state.flowerLogs.push({id:uid(), delta:-flower, reason:'下单抵扣', time:Date.now()});
+    save(); hideOverlay();
+    toast('下单成功！', function(){
+      var o=state.orders.pop();
+      setUsed(vid, Math.max(0,getUsed(vid)-amt));
+      state.flowers += flower;
+      save(); rerender();
+    });
+    refreshVault(); refreshHome(); celebrate('下单成功！','hug');
+  };
+}
+
+/* ============ 小红花 ============ */
+function refreshFlower(){
+  document.getElementById('flowerTotal').textContent = state.flowers;
+  var hlist=document.getElementById('habitList');
+  var html='';
+  HABITS.forEach(function(h){
+    var done=state.habitLogs.some(function(l){return l.habitId===h.id && isSameDay(l.time);});
+    html+='<div class="habit '+(done?'done':'')+'">'+
+      '<span class="hico">'+h.icon+'</span>'+
+      '<div class="hinfo"><div class="hname">'+h.name+(done?' ✓': '')+'</div><div class="hdesc">'+h.desc+'</div></div>'+
+      '<button class="btn btn-sm '+(done?'btn-ghost':'btn-primary')+'" data-habit="'+h.id+'" '+ (done?'disabled style="opacity:.5"':'')+'>'+h.reward+'朵</button>'+
+    '</div>';
+  });
+  hlist.innerHTML=html;
+  hlist.querySelectorAll('[data-habit]').forEach(function(b){
+    b.onclick=function(){
+      if(b.disabled) return;
+      var h=HABITS.find(function(x){return x.id===b.getAttribute('data-habit');});
+      state.flowers += h.reward;
+      state.flowerLogs.push({id:uid(), delta:h.reward, reason:h.name, time:Date.now()});
+      state.habitLogs.push({id:uid(), habitId:h.id, time:Date.now()});
+      save();
+      toast('打卡成功，+'+h.reward+' 朵小红花！', function(){
+        state.flowers -= h.reward;
+        state.flowerLogs.pop();
+        state.habitLogs.pop();
+        save(); rerender();
+      });
+      refreshFlower(); refreshHome(); celebrate('+'+h.reward+' 朵小红花','hug');
+    };
+  });
+  var flow=document.getElementById('flowerFlow');
+  if(state.flowerLogs.length===0){ flow.innerHTML='<div style="text-align:center;color:var(--ink-soft);padding:14px;font-size:13px">还没有花花流水</div>'; return; }
+  var fhtml='';
+  state.flowerLogs.slice().reverse().forEach(function(l){
+    fhtml+='<div class="flow-item"><span class="delta '+(l.delta>=0?'pos':'neg')+'">'+(l.delta>=0?'+':'')+l.delta+' 朵</span><span class="fdesc">'+esc(l.reason)+'</span><span class="ftime">'+fmtTime(l.time)+'</span></div>';
+  });
+  flow.innerHTML=fhtml;
+}
+function isSameDay(t){
+  var a=new Date(t), b=new Date();
+  return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate();
+}
+
+/* ============ 小荷包 ============ */
+function refreshPiggy(){
+  document.getElementById('piggyTotal').textContent = '¥'+state.piggy;
+  var plist=document.getElementById('piggyList');
+  var html='';
+  VOUCHERS.forEach(function(v){
+    var used=getUsed(v.id); var remain=Math.max(0,v.amount-used);
+    var deposited=state.piggyDeposited[usageKey(v.id)];
+    html+='<div class="habit" style="margin-bottom:8px">'+
+      '<span class="hico" style="background:'+v.color+'">'+v.icon+'</span>'+
+      '<div class="hinfo"><div class="hname">'+v.name+'</div><div class="hdesc">本月剩余 ¥'+remain+(deposited?'（已存入荷包）':'')+'</div></div>'+
+      '<button class="btn btn-sm '+(deposited?'btn-ghost':'btn-soft')+'" data-dp="'+v.id+'" '+(used<=0||deposited?'disabled style="opacity:.5"':'')+'>'+(deposited?'已存':'存 ¥'+remain)+'</button>'+
+    '</div>';
+  });
+  plist.innerHTML=html;
+  plist.querySelectorAll('[data-dp]').forEach(function(b){
+    b.onclick=function(){ if(!b.disabled) depositPiggy(b.getAttribute('data-dp')); };
+  });
+  var flow=document.getElementById('piggyFlow');
+  if(state.piggyLogs.length===0){ flow.innerHTML='<div style="text-align:center;color:var(--ink-soft);padding:14px;font-size:13px">还没有荷包流水</div>'; return; }
+  var fhtml='';
+  state.piggyLogs.slice().reverse().forEach(function(l){
+    fhtml+='<div class="flow-item"><span class="delta '+(l.delta>=0?'pos':'neg')+'">'+(l.delta>=0?'+':'')+'¥'+l.delta+'</span><span class="fdesc">'+esc(l.reason)+'</span><span class="ftime">'+fmtTime(l.time)+'</span></div>';
+  });
+  flow.innerHTML=fhtml;
+}
+
+/* ============ 心愿清单 ============ */
+function refreshWish(){
+  var done=state.wishes.filter(function(w){return w.done;}).length;
+  var total=state.wishes.length;
+  document.getElementById('wishBar').style.width=(total?Math.round(done/total*100):0)+'%';
+  document.getElementById('wishText').textContent=done+' / '+total;
+  var box=document.getElementById('wishList');
+  if(total===0){ box.innerHTML='<div class="empty"><div class="eemoji">🌟</div>还没有心愿<br>许一个想一起完成的事吧</div>'; return; }
+  var html='';
+  state.wishes.slice().reverse().forEach(function(w){
+    html+='<div class="wish '+(w.done?'done':'')+'">'+
+      '<div class="whead"><span class="check-circle" data-toggle="'+w.id+'">'+(w.done?'✓':'')+'</span><div class="wtitle">'+esc(w.title)+'</div><button class="btn btn-sm btn-ghost" data-delwish="'+w.id+'">删除</button></div>'+
+      (w.desc?'<div class="wdesc">'+esc(w.desc)+'</div>':'')+
+      (w.img?'<img class="wimg" src="'+esc(w.img)+'" onerror="this.style.display=\'none\'">':'')+
+      (w.note?'<div class="wnote">'+esc(w.note)+'</div>':'')+
+      '<div style="font-size:11px;color:var(--ink-soft);margin-top:6px">'+(w.done?'✓ 完成于 '+fmtTime(w.doneTime):'许愿于 '+fmtTime(w.time))+'</div>'+
+    '</div>';
+  });
+  box.innerHTML=html;
+  box.querySelectorAll('[data-toggle]').forEach(function(c){
+    c.onclick=function(){
+      var id=c.getAttribute('data-toggle');
+      var w=state.wishes.find(function(x){return x.id===id;});
+      if(!w.done){
+        w.done=true; w.doneTime=Date.now();
+        save(); toast('心愿完成啦！', function(){ w.done=false; w.doneTime=null; save(); rerender(); });
+        refreshWish(); celebrate('心愿达成！','kiss');
+      }else{
+        w.done=false; w.doneTime=null; save(); refreshWish();
+      }
+    };
+  });
+  box.querySelectorAll('[data-delwish]').forEach(function(b){
+    b.onclick=function(){
+      var id=b.getAttribute('data-delwish');
+      var w=state.wishes.find(function(x){return x.id===id;});
+      var idx=state.wishes.findIndex(function(x){return x.id===id;});
+      state.wishes.splice(idx,1); save();
+      toast('已删除心愿', function(){ state.wishes.splice(idx,0,w); save(); rerender(); });
+      refreshWish();
+    };
+  });
+}
+document.getElementById('addWishBtn').addEventListener('click', function(){
+  var box=document.getElementById('modalBox');
+  box.innerHTML='<div class="modal-title">许一个新心愿<span class="x" data-close>✕</span></div>'+
+    '<div class="field"><label>心愿</label><input class="input" id="mWishTitle" placeholder="想一起做的事，比如：去看海"></div>'+
+    '<div class="field"><label>描述（可选）</label><textarea class="input" id="mWishDesc" placeholder="补充一点细节…"></textarea></div>'+
+    '<div class="field"><label>照片链接（可选）</label><input class="input" id="mWishImg" placeholder="粘贴图片网址"></div>'+
+    '<button class="btn btn-primary btn-block" id="mWishSave">许下心愿</button>';
+  showOverlay(); bindClose(box);
+  document.getElementById('mWishSave').onclick=function(){
+    var title=document.getElementById('mWishTitle').value.trim();
+    if(!title){ toast('写个心愿吧'); return; }
+    state.wishes.push({id:uid(), role:state.role, title:title, desc:document.getElementById('mWishDesc').value.trim(), img:document.getElementById('mWishImg').value.trim(), done:false, note:'', time:Date.now(), doneTime:null});
+    save(); hideOverlay(); toast('心愿已许下'); refreshWish();
+  };
+});
+
+/* ============ 悄悄话 ============ */
+var selectedMood='happy';
+function buildMoodPick(){
+  var box=document.getElementById('moodPick');
+  box.innerHTML='';
+  MOODS.forEach(function(m){
+    var b=document.createElement('button');
+    b.className='mood'+(m.id===selectedMood?' sel':'');
+    b.textContent=m.ico;
+    b.title=m.name;
+    b.onclick=function(){ selectedMood=m.id; buildMoodPick(); };
+    box.appendChild(b);
+  });
+}
+function refreshWhisper(){
+  var box=document.getElementById('whisperList');
+  if(state.whispers.length===0){
+    box.innerHTML='<div class="empty"><div class="eemoji">💬</div>还没有悄悄话<br>先写一句给 TA 吧</div>';
+    return;
+  }
+  var html='';
+  state.whispers.slice().reverse().forEach(function(w){
+    var r=roleInfo(w.role);
+    var mood=MOODS.find(function(m){return m.id===w.mood;});
+    html+='<div class="whisper '+(w.role==='aj'?'aj':'xmy')+'">'+
+      '<img class="wava" src="'+r.img+'">'+
+      '<div class="wbubble"><div>'+(mood?'<span class="wmood">'+mood.ico+'</span>':'')+esc(w.text)+'</div><div class="wtime">'+fmtTime(w.time)+'</div></div>'+
+    '</div>';
+  });
+  box.innerHTML=html;
+  var m=document.getElementById('main');
+  m.scrollTop=m.scrollHeight;
+}
+buildMoodPick();
+document.getElementById('sendWhisperBtn').addEventListener('click', function(){
+  var t=document.getElementById('whisperText').value.trim();
+  if(!t){ toast('写点内容再发送吧'); return; }
+  state.whispers.push({id:uid(), role:state.role, mood:selectedMood, text:t, time:Date.now()});
+  save(); document.getElementById('whisperText').value='';
+  toast('悄悄话已发送', function(){ state.whispers.pop(); save(); rerender(); });
+  refreshWhisper();
+});
+
+/* ============ 我的 ============ */
+function refreshMe(){
+  var box=document.getElementById('meRole');
+  var r=roleInfo(state.role);
+  box.innerHTML='<div class="role-card sel"><img src="'+r.img+'"><div style="flex:1"><div class="rname">当前：'+r.name+'</div><div class="rtag">'+(state.role==='xmy'?'管账小能手 · 确认转账':'负责下单')+'</div></div><button class="btn btn-sm btn-soft" id="meSwitch">切换</button></div>';
+  document.getElementById('meSwitch').onclick=function(){ openRoleModal(); };
+}
+document.getElementById('exportBtn').addEventListener('click', function(){
+  var box=document.getElementById('modalBox');
+  var data=JSON.stringify(state);
+  box.innerHTML='<div class="modal-title">导出备份<span class="x" data-close>✕</span></div>'+
+    '<div class="field"><label>复制下面整段文本发给对方</label><textarea class="input" id="mExport" readonly style="min-height:160px;font-size:11px"></textarea></div>'+
+    '<button class="btn btn-primary btn-block" id="mCopy">复制</button>';
+  showOverlay(); bindClose(box);
+  document.getElementById('mExport').value=data;
+  document.getElementById('mCopy').onclick=function(){
+    var ta=document.getElementById('mExport');
+    ta.select();
+    try{ document.execCommand('copy'); }catch(e){}
+    if(navigator.clipboard) navigator.clipboard.writeText(data).catch(function(){});
+    toast('已复制备份文本');
+  };
+});
+document.getElementById('importBtn').addEventListener('click', function(){
+  var box=document.getElementById('modalBox');
+  box.innerHTML='<div class="modal-title">导入备份<span class="x" data-close>✕</span></div>'+
+    '<div class="field"><label>粘贴对方发来的备份文本</label><textarea class="input" id="mImport" style="min-height:120px;font-size:11px"></textarea></div>'+
+    '<button class="btn btn-primary btn-block" id="mImportSave">导入</button>';
+  showOverlay(); bindClose(box);
+  document.getElementById('mImportSave').onclick=function(){
+    try{
+      var d=JSON.parse(document.getElementById('mImport').value.trim());
+      if(!d.role) throw new Error('格式不对');
+      state=d; save(); hideOverlay(); toast('导入成功，已合并最新数据'); rerender();
+    }catch(e){ toast('备份文本无效，请完整复制'); }
+  };
+});
+
+/* ============ 全局重渲染 & 初始化 ============ */
+function rerender(){
+  refreshHome(); refreshMemory(); refreshVault(); refreshWish(); refreshFlower(); refreshPiggy(); refreshWhisper(); refreshMe(); updateRolePill();
+}
+/* 初始化 */
+updateRolePill();
+setRole(state.role);
+refreshHome();
+</script>
+</body>
+</html>
